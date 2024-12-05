@@ -39,4 +39,3 @@ To install the required libraries, run the following command in your terminal:
 
 ```bash
 pip install flask requests beautifulsoup4 ibm-watson
- 
