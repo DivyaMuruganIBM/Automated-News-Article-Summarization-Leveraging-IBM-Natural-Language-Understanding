@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Article Summarizer</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            background-image: 
+                linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px; /* Adjust as needed */
+            left: 20px; /* Adjust as needed */
+            font-size: 50px; /* Adjust size as needed */
+            color: #fff; /* Change letter color */
+            font-weight: bold; /* Bold style */
+            background-color: #007BFF; /* Change background color */
+            padding: 10px 15px; /* Add padding for spacing */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for effect */
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 70%;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #800080;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #800080;
+            margin-top: 10px;
+            letter-spacing: 0.8px;
+        }
+
+        form {
+            margin: 30px 0;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1em;
+            width: 80%;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background-color: #607D8B;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #607D8B;
+        }
+
+        #summary, #analysisResult {
+            text-align: left;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 1.2em;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">DV</div>
+    <div class="container">
+        <h1>Welcome to</h1>
+        <h2>Intelligent News Summarization with IBM NLU</h2>
+        <form id="urlForm">
+            <input type="text" id="url" name="url" placeholder="Enter the URL" required>
+            <button type="submit">Summarize</button>
+        </form>
+        <h2>Summary</h2>
+        <div id="summary"></div>
+        <button id="analyzeButton" style="display: none;">Analyze</button>
+        <h2>Entities and Keywords</h2>
+        <div id="analysisResult"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#urlForm').on('submit', function(event) {
+                event.preventDefault();
+                const url = $('#url').val();
+
+                $.post('/summarize', { url: url }, function(data) {
+                    $('#summary').text(data.summary);
+                    $('#analyzeButton').show().data('text', data.summary);
+                });
+            });
+
+            $('#analyzeButton').on('click', function() {
+                const text = $(this).data('text');
+
+                $.post('/analyze', { text: text }, function(data) {
+                    const entities = data.entities.map(entity => `<li>${entity.text} (${entity.type})</li>`).join('');
+                    const keywords = data.keywords.map(keyword => `<li>${keyword.text} (relevance: ${keyword.relevance})</li>`).join('');
+                    $('#analysisResult').html(`<h3>Entities</h3><ul>${entities}</ul><h3>Keywords</h3><ul>${keywords}</ul>`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
